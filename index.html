@@ -11,6 +11,7 @@
             --secondary: #64748b;
             --success: #22c55e;
             --error: #ef4444;
+            --gold: #f59e0b;
             --background: #f8fafc;
             --surface: #ffffff;
             --text: #0f172a;
@@ -24,216 +25,199 @@
             padding: 0;
             display: flex;
             justify-content: center;
+            align-items: center;
             min-height: 100vh;
+            flex-direction: column;
         }
 
         .container {
             width: 100%;
             max-width: 800px;
             background: var(--surface);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             margin: 20px;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
-        /* Header */
+        /* Copyright Footer */
+        .copyright {
+            margin-top: 10px;
+            margin-bottom: 20px;
+            font-size: 0.8rem;
+            color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+        }
+
+        /* Header & XP System */
         header {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             padding: 20px;
             text-align: center;
+            position: relative;
         }
 
-        h1 { margin: 0; font-size: 1.5rem; }
-        p.subtitle { margin: 5px 0 0; opacity: 0.9; font-size: 0.9rem; }
+        h1 { margin: 0; font-size: 1.4rem; }
+        p.subtitle { margin: 5px 0 0; opacity: 0.9; font-size: 0.85rem; }
+
+        .xp-bar-container {
+            background: rgba(255, 255, 255, 0.2);
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        .xp-fill {
+            height: 100%;
+            background: var(--gold);
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px var(--gold);
+        }
+        
+        .badge-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            background: rgba(0,0,0,0.1);
+            display: inline-flex;
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+        .badge-icon { font-size: 1.2rem; }
 
         /* Panels */
         .panel { padding: 30px; display: none; flex-direction: column; gap: 20px; }
         .panel.active { display: flex; }
 
-        /* Setup Panel */
-        .setup-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        /* Setup Inputs */
+        .setup-group { display: flex; flex-direction: column; gap: 10px; }
+        input[type="number"] { padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; }
         
-        input[type="number"] {
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-
         .btn {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            padding: 15px 30px; border: none; border-radius: 8px; font-size: 1rem;
+            font-weight: 600; cursor: pointer; transition: all 0.2s;
+            text-transform: uppercase; letter-spacing: 0.5px;
         }
-
         .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-dark); }
-        .btn-danger { background: var(--error); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2); }
         .btn-secondary { background: var(--secondary); color: white; }
 
-        /* Quiz Panel */
+        /* Quiz UI */
         .quiz-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-            color: var(--secondary);
-            font-size: 0.9rem;
+            display: flex; justify-content: space-between; align-items: center;
+            font-weight: bold; color: var(--secondary); font-size: 0.9rem;
         }
-
-        .progress-bar {
-            height: 6px;
-            background: #e2e8f0;
-            border-radius: 3px;
-            margin-top: 10px;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: var(--primary);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .question-text {
-            font-size: 1.25rem;
-            font-weight: 600;
-            line-height: 1.5;
-            margin: 10px 0 20px 0;
-        }
-
-        .options-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
+        
+        .question-text { font-size: 1.25rem; font-weight: 600; line-height: 1.5; margin: 10px 0 20px 0; }
+        
+        .options-grid { display: flex; flex-direction: column; gap: 12px; }
+        
         .option-btn {
-            background: white;
-            border: 2px solid #e2e8f0;
-            padding: 15px;
-            text-align: left;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.2s;
-            position: relative;
+            background: white; border: 2px solid #e2e8f0; padding: 15px; text-align: left;
+            border-radius: 8px; cursor: pointer; font-size: 1rem; transition: all 0.2s;
+            position: relative; overflow: hidden;
         }
+        .option-btn:hover:not(:disabled) { border-color: var(--primary); background: #eff6ff; }
+        
+        /* Answer States */
+        .option-btn.correct { background-color: #dcfce7; border-color: var(--success); color: #14532d; }
+        .option-btn.wrong { background-color: #fee2e2; border-color: var(--error); color: #7f1d1d; }
 
-        .option-btn:hover:not(:disabled) {
-            border-color: var(--primary);
-            background: #eff6ff;
+        /* Celebrations & Animations */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
+        .anim-shake { animation: shake 0.4s ease-in-out; }
 
-        .option-btn.correct {
-            background-color: #dcfce7;
-            border-color: var(--success);
-            color: #14532d;
-        }
-
-        .option-btn.wrong {
-            background-color: #fee2e2;
-            border-color: var(--error);
-            color: #7f1d1d;
-        }
-
-        .feedback-area {
-            min-height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-top: 10px;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        /* Result Panel */
-        .score-card {
-            text-align: center;
-            padding: 40px;
-            background: #f8fafc;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-
-        .score-big { font-size: 4rem; font-weight: 800; color: var(--primary); }
-        .score-label { font-size: 1.2rem; color: var(--secondary); }
-
-        .review-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #e2e8f0;
-            padding: 10px;
-            border-radius: 8px;
-        }
-
-        .review-item {
-            background: white;
-            padding: 15px;
-            border-radius: 6px;
-            border-left: 4px solid var(--error);
-            font-size: 0.9rem;
-        }
-        .review-q { font-weight: bold; margin-bottom: 5px; }
-        .review-a { color: var(--error); }
-        .review-c { color: var(--success); font-weight: 600; }
-
-        /* Animation */
         @keyframes pop {
             0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
+            50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
-        .anim-pop { animation: pop 0.2s ease; }
+        .anim-pop { animation: pop 0.3s ease; }
 
+        .confetti-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; overflow: hidden; z-index: 10;
+        }
+        .particle {
+            position: absolute; width: 8px; height: 8px; opacity: 0;
+        }
+
+        /* Review & Results */
+        .score-card { text-align: center; padding: 40px; background: #f8fafc; border-radius: 12px; }
+        .score-big { font-size: 4rem; font-weight: 800; color: var(--primary); }
+        .review-list {
+            display: flex; flex-direction: column; gap: 15px; max-height: 400px;
+            overflow-y: auto; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px;
+        }
+        .review-item {
+            background: white; padding: 15px; border-radius: 6px;
+            border-left: 4px solid var(--error); font-size: 0.9rem;
+        }
+        .review-c { color: var(--success); font-weight: 600; }
+
+        .feedback-area {
+            margin-top: 20px; display: flex; justify-content: space-between; align-items: center;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <div class="confetti-container" id="confetti-layer"></div>
     <header>
         <h1>ADULT NURSING CARE FINAL</h1>
-        <p class="subtitle">Comprehensive Exam Preparation (Sources 1-428)</p>
+        <p class="subtitle">Sources 1-428</p>
+        
+        <div class="badge-container">
+            <span class="badge-icon" id="badge-icon">🥚</span>
+            <span id="badge-name">Novice Nurse</span>
+            <span style="margin-left: 10px; opacity: 0.8;">| XP: <span id="xp-display">0</span></span>
+        </div>
+        <div class="xp-bar-container">
+            <div class="xp-fill" id="xp-fill"></div>
+        </div>
     </header>
 
     <div id="setup-panel" class="panel active">
         <div class="setup-group">
-            <label for="q-count">How many questions would you like to take?</label>
+            <label for="q-count">Number of Questions:</label>
             <p style="font-size: 0.8rem; color: gray;">Total available: <span id="total-q-display">0</span></p>
             <input type="number" id="q-count" min="1" value="50">
         </div>
         
-        <div class="setup-group" style="margin-top: 20px;">
-            <label style="display: flex; align-items: center; gap: 10px;">
+        <div class="setup-group" style="margin-top: 10px;">
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
                 <input type="checkbox" id="sound-toggle" checked> Enable Sound Effects
+            </label>
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="shuffle-answers" checked> Shuffle Answer Choices
             </label>
         </div>
 
-        <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+        <button class="btn btn-primary" onclick="startQuiz()">Start Exam</button>
     </div>
 
     <div id="quiz-panel" class="panel">
         <div class="quiz-header">
-            <span id="q-progress">Question 1 / 50</span>
+            <span id="q-progress">Q 1 / 50</span>
             <span id="score-display">Score: 0</span>
         </div>
-        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
 
         <div class="question-text" id="question-text">Loading...</div>
         
@@ -241,31 +225,31 @@
             </div>
 
         <div class="feedback-area">
-            <button class="btn btn-secondary" id="end-btn" onclick="finishQuiz()">End Quiz Early</button>
-            <button class="btn btn-primary" id="next-btn" style="display:none;" onclick="nextQuestion()">Next Question</button>
+            <button class="btn btn-secondary" id="end-btn" onclick="finishQuiz()">End Exam</button>
+            <button class="btn btn-primary" id="next-btn" style="display:none;" onclick="nextQuestion()">Next Question ➜</button>
         </div>
     </div>
 
     <div id="result-panel" class="panel">
         <div class="score-card">
-            <div class="score-label">Your Score</div>
+            <div class="score-label">Final Score</div>
             <div class="score-big" id="final-score">0%</div>
             <p id="final-stats">0 out of 0 correct</p>
+            <div id="final-xp-msg" style="color: var(--gold); font-weight: bold; margin-top: 10px;"></div>
         </div>
 
         <h3>Review Incorrect Answers</h3>
-        <div class="review-list" id="review-list">
-            </div>
+        <div class="review-list" id="review-list"></div>
 
-        <button class="btn btn-primary" onclick="location.reload()">Take New Quiz</button>
+        <button class="btn btn-primary" onclick="location.reload()">New Exam</button>
     </div>
 </div>
 
+<div class="copyright">© AMER ALSHARIF 2026</div>
+
 <script>
-    // --- DATABASE ---
-    // Format: [Question, Option A, Option B, Option C, Option D, CorrectIndex(0-3)]
-    // Based on Sources 1-428 from provided file
-    
+    // --- DATABASE (Full 428 Questions) ---
+    // Structure: [Question, OptA, OptB, OptC, OptD, CorrectIndex]
     const db = [
         ["What defines epilepsy?", "A single provoked seizure", "Two or more unprovoked seizures occurring more than 24 hours apart", "Any episode of abnormal sensory activity", "A seizure lasting more than 5 minutes", 1],
         ["What is a seizure?", "Only abnormal motor activity", "Episodes resulting from sudden excessive discharge from cerebral neurons", "Always involving the entire brain", "A psychological condition", 1],
@@ -696,47 +680,94 @@
         ["Postoperative care for colorectal cancer patients includes monitoring for:", "Hyperglycemia", "Hypovolemia, infection, and skin integrity", "Hypertension", "Urinary retention only", 1]
     ];
 
-    // --- LOGIC ---
+    // --- VARIABLES ---
     let currentQuestions = [];
     let currentIndex = 0;
     let score = 0;
+    let xp = 0;
     let wrongAnswers = [];
     let soundEnabled = true;
+    let shuffleAnswers = true;
 
-    // Audio Context (Synthesized sounds)
+    // --- AUDIO SYSTEM ---
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    
     function playSound(type) {
         if (!soundEnabled) return;
         if (audioCtx.state === 'suspended') audioCtx.resume();
-
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-
         const now = audioCtx.currentTime;
-        
         if (type === 'correct') {
             osc.type = 'sine';
             osc.frequency.setValueAtTime(600, now);
             osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
             gain.gain.setValueAtTime(0.1, now);
             gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-            osc.start(now);
-            osc.stop(now + 0.3);
+            osc.start(now); osc.stop(now + 0.3);
         } else {
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(150, now);
             osc.frequency.linearRampToValueAtTime(100, now + 0.3);
             gain.gain.setValueAtTime(0.1, now);
             gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-            osc.start(now);
-            osc.stop(now + 0.3);
+            osc.start(now); osc.stop(now + 0.3);
         }
     }
 
-    // Init
+    // --- VISUAL FX ---
+    function celebrateCorrect() {
+        const container = document.getElementById('confetti-layer');
+        for(let i=0; i<30; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.backgroundColor = ['#22c55e', '#3b82f6', '#f59e0b', '#ec4899'][Math.floor(Math.random()*4)];
+            p.style.left = '50%';
+            p.style.top = '50%';
+            container.appendChild(p);
+            
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = 5 + Math.random() * 10;
+            const x = Math.cos(angle) * velocity * 20;
+            const y = Math.sin(angle) * velocity * 20;
+
+            p.animate([
+                { transform: 'translate(0,0)', opacity: 1 },
+                { transform: `translate(${x}px, ${y}px)`, opacity: 0 }
+            ], { duration: 800, easing: 'ease-out' }).onfinish = () => p.remove();
+        }
+    }
+
+    function celebrateWrong() {
+        document.querySelector('.container').classList.add('anim-shake');
+        setTimeout(() => document.querySelector('.container').classList.remove('anim-shake'), 400);
+    }
+
+    // --- XP & BADGE SYSTEM ---
+    function updateXP(amount) {
+        xp += amount;
+        document.getElementById('xp-display').textContent = xp;
+        
+        // Logic for ranks
+        let rank = "Novice Nurse";
+        let icon = "🥚";
+        let max = 1000; 
+
+        if (xp >= 100) { rank = "Student Nurse"; icon = "📝"; }
+        if (xp >= 500) { rank = "Registered Nurse (RN)"; icon = "🩺"; }
+        if (xp >= 1000) { rank = "Charge Nurse"; icon = "🏥"; }
+        if (xp >= 2000) { rank = "Nurse Practitioner"; icon = "👩‍⚕️"; }
+
+        document.getElementById('badge-name').textContent = rank;
+        document.getElementById('badge-icon').textContent = icon;
+
+        // Bar fill logic (cyclical or capped)
+        let pct = Math.min((xp / 2000) * 100, 100);
+        document.getElementById('xp-fill').style.width = pct + '%';
+    }
+
+    // --- QUIZ LOGIC ---
     document.getElementById('total-q-display').textContent = db.length;
     document.getElementById('q-count').max = db.length;
 
@@ -744,14 +775,17 @@
         const countInput = parseInt(document.getElementById('q-count').value);
         const count = Math.min(Math.max(1, countInput), db.length);
         soundEnabled = document.getElementById('sound-toggle').checked;
+        shuffleAnswers = document.getElementById('shuffle-answers').checked;
 
-        // Shuffle and slice
+        // Shuffle questions
         const shuffled = [...db].sort(() => 0.5 - Math.random());
         currentQuestions = shuffled.slice(0, count);
         
         currentIndex = 0;
         score = 0;
+        xp = 0; // Reset XP per session or keep persistent? Usually reset per session for simple games.
         wrongAnswers = [];
+        updateXP(0);
 
         document.getElementById('setup-panel').classList.remove('active');
         document.getElementById('quiz-panel').classList.add('active');
@@ -762,51 +796,64 @@
     function loadQuestion() {
         const qData = currentQuestions[currentIndex];
         const qText = qData[0];
-        const options = qData.slice(1, 5);
-        
-        document.getElementById('q-progress').textContent = `Question ${currentIndex + 1} / ${currentQuestions.length}`;
+        const rawOptions = qData.slice(1, 5); // [A, B, C, D]
+        const correctIndex = qData[5];
+
+        document.getElementById('q-progress').textContent = `Q ${currentIndex + 1} / ${currentQuestions.length}`;
         document.getElementById('question-text').textContent = qText;
         document.getElementById('score-display').textContent = `Score: ${score}`;
 
-        // Reset UI
         document.getElementById('next-btn').style.display = 'none';
         document.getElementById('end-btn').style.display = 'inline-block';
-        document.getElementById('progress-fill').style.width = `${(currentIndex / currentQuestions.length) * 100}%`;
 
         const grid = document.getElementById('options-grid');
         grid.innerHTML = '';
 
-        options.forEach((opt, idx) => {
+        // Prepare options with tracking of original index
+        let optionsArr = rawOptions.map((text, idx) => ({ text, originalIdx: idx }));
+
+        if (shuffleAnswers) {
+            optionsArr.sort(() => 0.5 - Math.random());
+        }
+
+        optionsArr.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
-            btn.textContent = opt;
-            btn.onclick = () => checkAnswer(idx, btn);
+            btn.textContent = opt.text;
+            // We pass the ORIGINAL index to check correctness
+            btn.onclick = () => checkAnswer(opt.originalIdx, correctIndex, btn, optionsArr);
             grid.appendChild(btn);
         });
     }
 
-    function checkAnswer(selectedIdx, btnElement) {
-        const qData = currentQuestions[currentIndex];
-        const correctIdx = qData[5];
+    function checkAnswer(selectedIdx, correctIdx, btnElement, currentOptionsState) {
         const allBtns = document.querySelectorAll('.option-btn');
-
-        // Disable all buttons
         allBtns.forEach(b => b.disabled = true);
 
         if (selectedIdx === correctIdx) {
             btnElement.classList.add('correct', 'anim-pop');
             playSound('correct');
+            celebrateCorrect();
             score++;
+            updateXP(10); // +10 XP for correct
         } else {
             btnElement.classList.add('wrong', 'anim-pop');
-            allBtns[correctIdx].classList.add('correct'); // Show correct one
             playSound('wrong');
+            celebrateWrong();
             
-            // Save for review
+            // Highlight correct one
+            // We need to find which button corresponds to the correct original index
+            allBtns.forEach((b, i) => {
+                if (currentOptionsState[i].originalIdx === correctIdx) {
+                    b.classList.add('correct');
+                }
+            });
+
+            // Log for review
             wrongAnswers.push({
-                q: qData[0],
-                user: qData[selectedIdx + 1],
-                correct: qData[correctIdx + 1]
+                q: currentQuestions[currentIndex][0],
+                user: currentQuestions[currentIndex][selectedIdx + 1],
+                correct: currentQuestions[currentIndex][correctIdx + 1]
             });
         }
 
@@ -827,44 +874,35 @@
         document.getElementById('quiz-panel').classList.remove('active');
         document.getElementById('result-panel').classList.add('active');
 
-        // Calculate score based on questions ATTEMPTED (if ended early) or TOTAL (if finished)
-        // For fairness, if ended early, we base % on attempted.
-        const total = currentIndex === 0 ? 1 : currentIndex; // Avoid div by zero
-        // Actually, logic is: if finished normally, total is length. If early, total is current index + 1 (if answered)
-        // Simplified: use currentIndex if buttons clicked, but if next-btn visible, currentIndex + 1 answered.
-        // Let's stick to questions seen.
-        
+        // Logic: Calculate based on questions presented
         let processed = currentIndex;
-        // If the user answered the last question displayed but didn't click next, count it
-        if (document.getElementById('next-btn').style.display !== 'none') {
-             processed = currentIndex + 1;
-        }
-
+        if (document.getElementById('next-btn').style.display !== 'none') processed++; 
         if (processed === 0) processed = 1;
 
         const percent = Math.round((score / processed) * 100);
         document.getElementById('final-score').textContent = `${percent}%`;
         document.getElementById('final-stats').textContent = `${score} out of ${processed} correct`;
+        
+        const xpMsg = document.getElementById('final-xp-msg');
+        xpMsg.textContent = `Total XP Earned: ${xp}`;
 
-        // Render Review
         const list = document.getElementById('review-list');
         list.innerHTML = '';
         if (wrongAnswers.length === 0) {
-            list.innerHTML = '<p style="text-align:center; color: var(--success);">Perfect! No wrong answers.</p>';
+            list.innerHTML = '<p style="text-align:center; color: var(--success);">Perfect Score! No reviews needed.</p>';
         } else {
             wrongAnswers.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'review-item';
                 div.innerHTML = `
-                    <div class="review-q">${item.q}</div>
-                    <div class="review-a">You chose: ${item.user}</div>
+                    <div style="font-weight:bold; margin-bottom:5px;">${item.q}</div>
+                    <div style="color:var(--error);">You: ${item.user}</div>
                     <div class="review-c">Correct: ${item.correct}</div>
                 `;
                 list.appendChild(div);
             });
         }
     }
-
 </script>
 </body>
 </html>
