@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADULT NURSING CARE FINAL</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #64748b;
+            --success: #22c55e;
+            --error: #ef4444;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--surface);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 { margin: 0; font-size: 1.5rem; }
+        p.subtitle { margin: 5px 0 0; opacity: 0.9; font-size: 0.9rem; }
+
+        /* Panels */
+        .panel { padding: 30px; display: none; flex-direction: column; gap: 20px; }
+        .panel.active { display: flex; }
+
+        /* Setup Panel */
+        .setup-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        input[type="number"] {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-danger { background: var(--error); color: white; }
+        .btn-secondary { background: var(--secondary); color: white; }
+
+        /* Quiz Panel */
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin: 10px 0 20px 0;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #e2e8f0;
+            padding: 15px;
+            text-align: left;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: #eff6ff;
+        }
+
+        .option-btn.correct {
+            background-color: #dcfce7;
+            border-color: var(--success);
+            color: #14532d;
+        }
+
+        .option-btn.wrong {
+            background-color: #fee2e2;
+            border-color: var(--error);
+            color: #7f1d1d;
+        }
+
+        .feedback-area {
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 10px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* Result Panel */
+        .score-card {
+            text-align: center;
+            padding: 40px;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .score-big { font-size: 4rem; font-weight: 800; color: var(--primary); }
+        .score-label { font-size: 1.2rem; color: var(--secondary); }
+
+        .review-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .review-item {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid var(--error);
+            font-size: 0.9rem;
+        }
+        .review-q { font-weight: bold; margin-bottom: 5px; }
+        .review-a { color: var(--error); }
+        .review-c { color: var(--success); font-weight: 600; }
+
+        /* Animation */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        .anim-pop { animation: pop 0.2s ease; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>ADULT NURSING CARE FINAL</h1>
+        <p class="subtitle">Comprehensive Exam Preparation (Sources 1-428)</p>
+    </header>
+
+    <div id="setup-panel" class="panel active">
+        <div class="setup-group">
+            <label for="q-count">How many questions would you like to take?</label>
+            <p style="font-size: 0.8rem; color: gray;">Total available: <span id="total-q-display">0</span></p>
+            <input type="number" id="q-count" min="1" value="50">
+        </div>
+        
+        <div class="setup-group" style="margin-top: 20px;">
+            <label style="display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" id="sound-toggle" checked> Enable Sound Effects
+            </label>
+        </div>
+
+        <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+    </div>
+
+    <div id="quiz-panel" class="panel">
+        <div class="quiz-header">
+            <span id="q-progress">Question 1 / 50</span>
+            <span id="score-display">Score: 0</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+
+        <div class="question-text" id="question-text">Loading...</div>
+        
+        <div class="options-grid" id="options-grid">
+            </div>
+
+        <div class="feedback-area">
+            <button class="btn btn-secondary" id="end-btn" onclick="finishQuiz()">End Quiz Early</button>
+            <button class="btn btn-primary" id="next-btn" style="display:none;" onclick="nextQuestion()">Next Question</button>
+        </div>
+    </div>
+
+    <div id="result-panel" class="panel">
+        <div class="score-card">
+            <div class="score-label">Your Score</div>
+            <div class="score-big" id="final-score">0%</div>
+            <p id="final-stats">0 out of 0 correct</p>
+        </div>
+
+        <h3>Review Incorrect Answers</h3>
+        <div class="review-list" id="review-list">
+            </div>
+
+        <button class="btn btn-primary" onclick="location.reload()">Take New Quiz</button>
+    </div>
+</div>
+
+<script>
+    // --- DATABASE ---
+    // Format: [Question, Option A, Option B, Option C, Option D, CorrectIndex(0-3)]
+    // Based on Sources 1-428 from provided file
+    
+    const db = [
+        ["What defines epilepsy?", "A single provoked seizure", "Two or more unprovoked seizures occurring more than 24 hours apart", "Any episode of abnormal sensory activity", "A seizure lasting more than 5 minutes", 1],
+        ["What is a seizure?", "Only abnormal motor activity", "Episodes resulting from sudden excessive discharge from cerebral neurons", "Always involving the entire brain", "A psychological condition", 1],
+        ["Which is NOT a main seizure type?", "Generalized", "Focal", "Provoked", "Unknown onset", 2],
+        ["All of the following are causes of seizures EXCEPT:", "Cerebrovascular disease", "Hypertension (chronic)", "Hypoglycemia", "CNS infections", 1],
+        ["Which phase may occur without loss of consciousness?", "Tonic-clonic phase", "Aura phase", "Postictal phase", "Epileptic cry", 1],
+        ["During a generalized tonic-clonic seizure, what may occur?", "Only one side of the body reacts", "Incontinence of urine and feces", "Patient remains fully conscious", "No muscle rigidity", 1],
+        ["In the postictal state, the patient may experience:", "Euphoria", "Confusion and fatigue", "Increased alertness", "Improved memory", 1],
+        ["Focal seizures are characterized by:", "Always involving loss of consciousness", "Motor and/or non-motor symptoms", "Never involving the limbs", "Only visual disturbances", 1],
+        ["Which diagnostic tool is best for detecting structural brain lesions?", "EEG", "MRI", "Blood glucose test", "SPECT", 1],
+        ["What is a key nursing responsibility during a seizure?", "Restrain the patient", "Observe and document the sequence of events", "Insert an oral airway during active convulsions", "Give oral medication immediately", 1],
+        ["What should the nurse do during a seizure?", "Place patient on side-lying position if possible", "Insert a spoon into the mouth", "Restrain limbs to prevent injury", "Shout at the patient to stop", 0],
+        ["Which action is correct during a seizure?", "Loosen constrictive clothing", "Hold the patient’s mouth open", "Pour water on the patient’s face", "Leave the patient alone", 0],
+        ["The goal of pharmacologic therapy in epilepsy is to:", "Cure the condition", "Control seizures with minimal side effects", "Replace surgery", "Eliminate all medications over time", 1],
+        ["Gingival hyperplasia is associated with long-term use of:", "Gabapentin", "Phenytoin", "Levetiracetam", "Valproate", 1],
+        ["What does a Vagal Nerve Stimulator (VNS) do?", "Cures epilepsy permanently", "Delivers electrical signals to the brain via the vagus nerve", "Removes brain tumors", "Monitors blood pressure", 1],
+        ["The Responsive Neurostimulation System (RNS) works by:", "Stimulating the heart", "Interrupting brainwave activity before a clinical seizure", "Replacing anticonvulsant medications", "Causing temporary amnesia", 1],
+        ["A key nursing diagnosis for a patient with epilepsy is:", "Risk for injury related to seizure activity", "Impaired gas exchange", "Fluid volume excess", "Chronic pain", 0],
+        ["To reduce fear of seizures, the nurse should encourage:", "Avoiding all physical activity", "Adherence to prescribed medication regimen", "Secrecy about the condition", "Stopping medication if feeling well", 1],
+        ["What should a patient with epilepsy carry for emergencies?", "A written diary", "Medical identification bracelet or card", "Extra dose of sedatives", "A flashlight", 1],
+        ["Status epilepticus is defined as:", "A single brief seizure", "Seizures lasting ≥30 minutes without full recovery between attacks", "Seizures only during sleep", "Focal seizures without impairment", 1],
+        ["A precipitating factor for status epilepticus is:", "Regular medication use", "Interruption of anticonvulsant therapy", "Mild dehydration", "Normal sleep patterns", 1],
+        ["During status epilepticus, priority nursing action includes:", "Giving oral fluids", "Ensuring airway and oxygenation", "Administering IM medication", "Letting the seizure run its course", 1],
+        ["Which medication has a risk of Stevens-Johnson syndrome?", "Phenobarbital", "Lamotrigine", "Diazepam", "Carbamazepine", 1],
+        ["Which is a dose-related side effect of valproate?", "Nausea and vomiting", "Hepatotoxicity only", "Nephrolithiasis", "Aplastic anemia", 0],
+        ["Patients on long-term phenytoin should have regular monitoring for:", "Gingival hyperplasia and blood dyscrasias", "Hearing loss", "Thyroid dysfunction", "Osteoarthritis", 0],
+        ["What is Multiple Sclerosis (MS)?", "A bacterial infection of the CNS", "An immune-mediated, progressive demyelinating disease of the CNS", "A genetic disorder affecting muscle tone", "A vascular disorder causing brain hemorrhages", 1],
+        ["What is demyelination?", "Growth of new nerve fibers", "Destruction of the myelin sheath surrounding nerve fibers", "Inflammation of the spinal cord", "Formation of plaques in muscles", 1],
+        ["Which population is MOST affected by MS?", "Men over 60", "Women aged 20–50", "Children under 10", "Equal distribution across all ages", 1],
+        ["A key geographic pattern in MS prevalence is:", "Higher in tropical regions", "Higher in northern colder latitudes", "Higher in urban vs. rural areas", "No geographic pattern", 1],
+        ["Which is NOT a confirmed risk factor for MS?", "Obesity in adolescence", "Low vitamin D exposure", "High sugar intake in childhood", "Genetic variations", 2],
+        ["Which form of MS is characterized by episodes of worsening symptoms followed by recovery?", "Primary Progressive MS", "Remitting-Relapsing MS (RRMS)", "Radiologically Isolated Syndrome", "Progressive-Relapsing MS", 1],
+        ["The MOST common initial presentation of MS is:", "Seizures", "Visual disturbances (e.g., optic neuritis)", "Severe headache", "Loss of consciousness", 1],
+        ["Which symptom is LEAST likely in MS?", "Fatigue", "Spasticity", "Diplopia", "Loss of sensation in all cases", 3],
+        ["What is a common cause of pain in MS patients?", "Muscle hypertrophy", "Lesions on sensory pathways & osteoporosis", "Chronic infections", "Vitamin deficiencies", 1],
+        ["Emotional lability in MS is due to:", "Medication side effects", "Loss of control connections between cortex and basal ganglia", "Chronic pain", "Sleep deprivation", 1],
+        ["The MOST important diagnostic tool for detecting MS plaques is:", "X-ray", "MRI", "Blood test", "Urinalysis", 1],
+        ["What does oligoclonal banding in CSF indicate?", "Bacterial infection", "Immune system abnormality", "High glucose levels", "Liver dysfunction", 1],
+        ["The primary goal of disease-modifying therapy in MS is to:", "Cure the disease", "Delay progression and reduce relapse frequency", "Replace surgical intervention", "Eliminate all symptoms immediately", 1],
+        ["Which medication is administered subcutaneously for RRMS?", "Oral prednisone", "Glatiramer acetate", "IV methylprednisolone", "Mitoxantrone", 1],
+        ["A common side effect of interferon-beta therapy is:", "Hypertension", "Flulike symptoms", "Hair loss", "Weight gain", 1],
+        ["Which medication is used to manage spasticity in MS?", "Insulin", "Baclofen", "Warfarin", "Metformin", 1],
+        ["To minimize fatigue, MS patients should be advised to:", "Exercise intensely once daily", "Take frequent short rest periods", "Avoid all physical activity", "Consume high-caffeine drinks", 1],
+        ["A key nursing intervention to prevent falls in MS patients is:", "Restrict mobility", "Instruct to walk with a wider base of support", "Encourage rapid walking", "Avoid using assistive devices", 1],
+        ["Which is a non-pharmacologic strategy for bladder dysfunction in MS?", "Diuretic therapy", "Increased fluid intake & perineal care", "Long-term catheterization", "Avoiding all fluids", 1],
+        ["When teaching about heat sensitivity, the nurse should advise:", "Use hot baths for relaxation", "Avoid hot temperatures & extreme cold", "Sauna therapy is beneficial", "Exercise in midday sun", 1],
+        ["Myasthenia Gravis (MG) is characterized by:", "Sensory loss and pain", "Weakness of voluntary muscles", "Uncontrolled movements", "Memory impairment", 1],
+        ["The ocular form of MG primarily presents with:", "Hearing loss", "Ptosis and diplopia", "Limb paralysis", "Speech impairment", 1],
+        ["Myasthenic crisis is characterized by:", "Hypertension and tachycardia", "Severe generalized weakness & respiratory failure", "Hyperactive reflexes", "Skin rash and fever", 1],
+        ["Bulbar symptoms in MG refer to weakness in:", "Limbs", "Face, throat, and swallowing muscles", "Trunk muscles", "Eye muscles only", 1],
+        ["MG affects neurotransmission at the:", "Synapse between sensory neurons", "Myoneural (neuromuscular) junction", "Spinal cord interneurons", "Cerebral cortex", 1],
+        ["The edrophonium (Tensilon) test is used to diagnose MG by:", "Measuring antibody levels", "Observing temporary improvement in muscle strength", "Assessing cognitive function", "Testing visual acuity", 1],
+        ["Which test involves applying an ice pack to the eyes?", "MRI scan", "Ice test for ptosis", "Lumbar puncture", "Nerve conduction study", 1],
+        ["The primary goal of thymectomy in MG is to:", "Cure the disease permanently", "Reduce antibody production & induce remission", "Relieve pain", "Improve vision", 1],
+        ["Therapeutic plasma exchange (plasmapheresis) works by:", "Adding new antibodies", "Removing circulating antibodies", "Stimulating nerve growth", "Reducing inflammation in muscles", 1],
+        ["Which medication is an anticholinesterase used in MG?", "Prednisone", "Pyridostigmine", "Interferon-beta", "Baclofen", 1],
+        ["To minimize aspiration risk, MG patients should:", "Eat quickly", "Time meals with peak medication effects", "Lie down after eating", "Drink thin liquids rapidly", 1],
+        ["A key sign of impending respiratory failure in MG is:", "Increased appetite", "Decreased vital capacity & negative inspiratory force", "Elevated blood pressure", "Skin flushing", 1],
+        ["For a patient with ptosis, nursing advice includes:", "Rubbing eyes frequently", "Taping eyelids closed intermittently & using artificial tears", "Avoiding all eye care", "Using bright lights", 1],
+        ["Energy conservation strategies for MG include:", "Sleeping less to stay active", "Keeping frequently used items on each floor of the home", "Avoiding all planned rest", "Exercising to exhaustion", 1],
+        ["Patient education should emphasize avoiding:", "Regular medication schedule", "Emotional stress and respiratory infections", "All social activities", "Protein-rich foods", 1],
+        ["A life-threatening complication in both MS and MG is:", "Mild headache", "Respiratory failure", "Weight gain", "Dry skin", 1],
+        ["The suicide rate in MS patients is:", "Lower than general population", "Twice that of the general population", "Not associated with depression", "Only in advanced stages", 1],
+        ["The role of the Myasthenia Gravis Foundation of America includes:", "Providing surgical treatment", "Offering support services & education", "Manufacturing medications", "Diagnosing patients", 1],
+        ["Cognitive changes in MS may require referral to:", "Cardiologist", "Neuropsychologist", "Dermatologist", "Orthopedic surgeon", 1],
+        ["A common complication in immobile MS patients is:", "Improved bone density", "Pressure injuries", "Hyperactivity", "Increased muscle mass", 1],
+        ["What is another term for an ischemic stroke?", "Cerebral aneurysm", "Cerebrovascular Accident (CVA) or 'Brain Attack'", "Subarachnoid hemorrhage", "Transient ischemic attack", 1],
+        ["What is the primary cause of an ischemic stroke?", "Rupture of a blood vessel", "Disruption of blood supply to a part of the brain", "Infection of brain tissue", "Traumatic brain injury", 1],
+        ["What percentage of strokes are ischemic?", "13%", "50%", "87%", "25%", 2],
+        ["What percentage of strokes are hemorrhagic?", "13%", "50%", "87%", "30%", 0],
+        ["A TIA (Transient Ischemic Attack) typically lasts:", "24 hours", "1 week", "1-2 hours", "30 minutes", 2],
+        ["Which type of ischemic stroke accounts for 20% of cases and is caused by atherosclerotic plaques?", "Small penetrating artery thrombotic", "Cryptographic", "Large artery thrombotic", "Cardiogenic embolic", 2],
+        ["Cardiogenic embolic strokes are commonly associated with:", "Hypertension", "Atrial fibrillation", "Diabetes mellitus", "Migraine", 1],
+        ["Which type of ischemic stroke has 'no known cause'?", "Large artery thrombotic", "Cryptogenic", "Cardiogenic embolic", "Small penetrating artery thrombotic", 1],
+        ["What percentage of ischemic strokes are 'cryptogenic'?", "5%", "20%", "30%", "25%", 2],
+        ["Small penetrating artery thrombotic strokes account for what percentage of ischemic strokes?", "20%", "25%", "30%", "5%", 1],
+        ["The FAST acronym for stroke assessment stands for:", "Face, Arm, Speech, Time", "Face, Arm, Speech, Time", "Face, Arm, Stability, Time", "Face, Alertness, Speech, Time", 1],
+        ["Which of these is NOT a common presenting symptom of ischemic stroke?", "Hemiplegia", "Aphasia", "Fever", "Visual disturbances", 2],
+        ["In the early stage of stroke, muscle tone is typically:", "Spastic", "Flaccid", "Normal", "Hypertonic", 1],
+        ["Spasticity in stroke patients usually reappears by:", "12 hours", "48 hours", "1 week", "24 hours", 1],
+        ["Homonymous hemianopsia refers to:", "Double vision", "Blindness in half of the visual field", "Complete blindness", "Tunnel vision", 1],
+        ["What is dysarthria?", "Inability to understand language", "Difficulty in speaking", "Inability to recognize objects", "Loss of memory", 1],
+        ["A patient who cannot express themselves but understands language has:", "Global aphasia", "Receptive aphasia", "Expressive aphasia", "Dysphasia", 2],
+        ["Agnosia is:", "Inability to speak", "Loss of ability to recognize objects through a sensory system", "Muscle weakness", "Memory loss", 1],
+        ["Apraxia refers to:", "Language comprehension deficit", "Inability to perform previously learned actions", "Visual field defect", "Emotional lability", 1],
+        ["Which cognitive function is most likely impaired with frontal lobe damage from stroke?", "Hearing", "Vision", "Attention span and motivation", "Taste sensation", 2],
+        ["A patient with left-sided weakness most likely has a stroke in the:", "Right hemisphere", "Left hemisphere", "Brainstem", "Cerebellum", 0],
+        ["Aphasia is most commonly associated with stroke in the:", "Left hemisphere", "Right hemisphere", "Both hemispheres equally", "Cerebellum", 0],
+        ["Spatial-perceptual deficits are characteristic of stroke in the:", "Left hemisphere", "Right hemisphere", "Brainstem", "Frontal lobe only", 1],
+        ["Which behavior is typical of right hemispheric stroke?", "Slow, cautious behavior", "Impulsive behavior and poor judgment", "Excellent self-awareness", "Minimal emotional response", 1],
+        ["Left visual field deficit indicates stroke in the:", "Left eye", "Right hemisphere", "Left hemisphere", "Optic nerve", 1],
+        ["The initial diagnostic test for suspected stroke is usually:", "MRI", "Non-contrast CT scan", "Lumbar puncture", "Carotid ultrasound", 1],
+        ["Which test is used to detect cardiac sources of emboli?", "Carotid ultrasound", "Echocardiography", "EEG", "SPECT scan", 1],
+        ["What does the presence of oligoclonal bands in CSF suggest in MS diagnosis?", "Bacterial infection", "Immune system abnormality", "Viral infection", "Normal finding", 1],
+        ["The Glasgow Coma Scale assesses:", "Eye opening, verbal response, motor response", "Pupil size, heart rate, blood pressure", "Memory, attention, language", "Muscle strength, coordination, sensation", 0],
+        ["Transcranial Doppler is used to assess:", "Brain tumors", "Cerebral blood flow velocity", "Spinal cord function", "Peripheral nerves", 1],
+        ["The MOST important modifiable risk factor for stroke is:", "Diabetes", "Hypertension", "Obesity", "Smoking", 1],
+        ["The DASH diet is designed to help control:", "Diabetes", "Hypertension", "Cholesterol", "Weight", 1],
+        ["Which is a NON-modifiable risk factor for stroke?", "Smoking", "Advanced age", "Obesity", "Sedentary lifestyle", 1],
+        ["Low-dose aspirin is used for stroke prevention primarily due to its:", "Anti-inflammatory effect", "Antiplatelet effect", "Analgesic effect", "Antipyretic effect", 1],
+        ["Sleep apnea increases stroke risk by contributing to:", "Diabetes", "Hypertension and hypoxia", "Obesity only", "Hypercoagulability", 1],
+        ["The time window for administering IV t-PA for ischemic stroke is within:", "1 hour of symptom onset", "3-4.5 hours of symptom onset", "6 hours of symptom onset", "12 hours of symptom onset", 1],
+        ["What is the maximum dose of t-PA?", "60 mg", "90 mg", "120 mg", "150 mg", 1],
+        ["Which blood pressure reading would make a patient INELIGIBLE for t-PA?", "140/90 mmHg", "160/100 mmHg", "190/110 mmHg", "180/95 mmHg", 2],
+        ["After t-PA administration, anticoagulants are withheld for:", "6 hours", "12 hours", "24 hours", "48 hours", 2],
+        ["The most serious side effect of t-PA therapy is:", "Nausea", "Bleeding", "Headache", "Hypertension", 1],
+        ["For ischemic stroke patients NOT receiving t-PA, when should antihypertensives be considered?", "SBP > 180 or DBP > 100", "SBP > 220 or DBP > 120", "SBP > 200 or DBP > 110", "Any elevated BP", 1],
+        ["The optimal head of bed elevation to decrease ICP is:", "15 degrees", "30 degrees", "45 degrees", "90 degrees", 1],
+        ["What is the target blood glucose range in acute stroke management?", "80-120 mg/dL", "140-180 mg/dL", "200-250 mg/dL", "70-110 mg/dL", 1],
+        ["Mannitol is used in stroke management as a(n):", "Anticoagulant", "Osmotic diuretic to reduce ICP", "Thrombolytic", "Antihypertensive", 1],
+        ["Hemicraniectomy may be performed for:", "Carotid stenosis", "Increased ICP from brain edema", "Cerebral aneurysm", "Seizure control", 1],
+        ["Carotid endarterectomy involves removal of:", "Brain tumor", "Atherosclerotic plaque from carotid artery", "Cerebral aneurysm", "Blood clot from brain", 1],
+        ["Carotid endarterectomy is indicated for symptomatic patients with stenosis of:", "30-49%", "70-99%", "100% (complete occlusion)", "Any degree of stenosis", 1],
+        ["Post-carotid endarterectomy, priority monitoring includes:", "Blood glucose", "Neurologic status and blood pressure", "Urine output only", "Temperature every 4 hours", 1],
+        ["The most serious complication after carotid endarterectomy is:", "Wound infection", "Stroke", "Hypertension", "Hoarseness", 1],
+        ["Which patient is BEST suited for carotid endarterectomy?", "Asymptomatic with 40% stenosis", "Symptomatic with 80% stenosis", "Asymptomatic with 60% stenosis", "Symptomatic with 30% stenosis", 1],
+        ["The most common cause of primary intracerebral hemorrhage is:", "Aneurysm rupture", "Uncontrolled hypertension", "Trauma", "Anticoagulant use", 1],
+        ["Subarachnoid hemorrhage typically results from:", "Hypertension", "Ruptured intracranial aneurysm", "Arteriovenous malformation", "Brain tumor", 1],
+        ["Which medication can cause secondary intracerebral hemorrhage?", "Antibiotics", "Anticoagulants", "Antihypertensives", "Antidepressants", 1],
+        ["Cerebral amyloid angiopathy is a primary cause of hemorrhage in:", "Children", "Young adults", "The elderly", "All ages equally", 2],
+        ["The classic symptom of subarachnoid hemorrhage is:", "Hemiplegia", "\"Worst headache of my life\"", "Seizure", "Visual loss", 1],
+        ["Nuchal rigidity (neck stiffness) is characteristic of:", "Ischemic stroke", "Subarachnoid hemorrhage", "TIA", "All strokes", 1],
+        ["Which symptom is MORE common in hemorrhagic vs. ischemic stroke?", "Aphasia", "Early decreased consciousness", "Hemiparesis", "Visual disturbance", 1],
+        ["Focal seizures are more likely with:", "TIA", "Hemorrhagic stroke", "Ischemic stroke", "All equally", 1],
+        ["Tinnitus and dizziness may accompany hemorrhage in the:", "Frontal lobe", "Posterior circulation", "Brainstem only", "Cerebellum only", 1],
+        ["The MOST important diagnostic test for hemorrhagic stroke is:", "EEG", "CT scan", "Lumbar puncture", "Carotid ultrasound", 1],
+        ["Cerebral vasospasm typically occurs how many days after hemorrhage?", "1-2 days", "3-14 days", "15-30 days", "Immediately", 1],
+        ["Which complication results from blood obstructing CSF flow?", "Seizures", "Hydrocephalus", "Vasospasm", "Re-bleeding", 1],
+        ["The most common cause of death after hemorrhagic stroke is:", "Infection", "Re-bleeding", "Seizures", "Cardiac arrest", 1],
+        ["Vasospasm can lead to:", "Improved perfusion", "Cerebral ischemia", "Reduced ICP", "Resolution of hemorrhage", 1],
+        ["Primary intracerebral hemorrhage is typically:", "Managed medically, not surgically", "Always treated surgically", "Treated with t-PA", "Managed with anticoagulants", 0],
+        ["When is surgical evacuation (craniotomy) considered for hemorrhage?", "Always", "With worsening neurologic exam or increased ICP", "Only for small hemorrhages", "Never for elderly patients", 1],
+        ["For hemorrhage caused by warfarin, what is administered?", "t-PA", "Vitamin K and fresh frozen plasma", "Heparin", "Aspirin", 1],
+        ["DVT prophylaxis after hemorrhagic stroke begins:", "Immediately", "After 1-4 days if bleeding has stopped", "After 1 week", "Never, due to bleeding risk", 1],
+        ["Fever in the first 24 hours after stroke is associated with:", "Better outcomes", "Increased mortality", "No effect on outcome", "Reduced cerebral edema", 1],
+        ["The MOST important nursing intervention to prevent aspiration is:", "NPO status", "Positioning and swallowing assessment", "Frequent oral care", "Thickened liquids only", 1],
+        ["Which is a potential complication of immobility after stroke?", "Pressure injuries", "Hypertension", "Hyperglycemia", "All of the above", 0],
+        ["Urinary tract infections are common after stroke due to:", "Incontinence and catheter use", "Excessive fluid intake", "Antibiotic overuse", "Diabetes only", 0],
+        ["Depression after stroke is:", "Rare", "Common", "Always temporary", "Unrelated to stroke severity", 1],
+        ["Emotional lability after stroke refers to:", "Depression only", "Rapid mood changes", "Lack of emotion", "Anxiety disorders", 1],
+        ["Most recovery from ischemic stroke occurs within:", "1 month", "3-6 months", "1 year", "2 years", 1],
+        ["Recovery from hemorrhagic stroke is typically:", "Faster than ischemic stroke", "Slower with more disability", "Similar to ischemic stroke", "Complete in most cases", 1],
+        ["The suicide rate in stroke patients is:", "Lower than general population", "Higher than general population", "Same as general population", "Not studied", 1],
+        ["Korsakoff's syndrome after stroke may include:", "Disorientation and hallucinations", "Muscle weakness only", "Visual problems only", "Language deficits only", 0],
+        ["Family education should emphasize:", "Complete recovery expectations", "Safety measures and medication management", "Avoiding all physical activity", "Isolation to prevent infection", 1],
+        ["Which structures are part of the UPPER respiratory tract?", "Trachea and bronchi", "Nasal cavity, pharynx, and larynx", "Bronchioles and alveoli", "Lungs and pleura", 1],
+        ["Viral rhinitis (common cold) is characterized by:", "High fever and severe headache", "Nasal congestion, rhinorrhea, and sore throat", "Productive cough with green sputum", "Chest pain and dyspnea", 1],
+        ["How long do symptoms of viral rhinitis typically last?", "1-2 days", "1-2 weeks", "3-4 weeks", "1 month", 1],
+        ["Which medication is commonly used for nasal obstruction in rhinitis?", "Antibiotics", "Oral decongestants", "Anticoagulants", "Bronchodilators", 1],
+        ["Patient education for allergic rhinitis includes avoiding:", "All fluids", "Dust, molds, and tobacco smoke", "All medications", "Rest and sleep", 1],
+        ["Rhinosinusitis involves inflammation of the:", "Larynx only", "Paranasal sinuses and nasal cavity", "Bronchi and bronchioles", "Pharynx and tonsils", 1],
+        ["What should patients with acute rhinosinusitis avoid?", "All medications", "Swimming, diving, and air travel", "Drinking fluids", "Warm compresses", 1],
+        ["Which complication may result from untreated rhinosinusitis?", "Kidney failure", "Osteomyelitis", "Myocardial infarction", "Liver cirrhosis", 1],
+        ["Nursing management for rhinosinusitis includes instructing patients to use:", "Cold compresses only", "Warm compresses to relieve pressure", "Ice packs on the face", "No compresses", 1],
+        ["What promotes drainage of sinuses?", "Humidification of air", "Dry air", "Cold air", "Dusty environment", 0],
+        ["The most common cause of acute pharyngitis is:", "Bacterial infection", "Viral infection", "Fungal infection", "Allergic reaction", 1],
+        ["Which bacterium causes \"strep throat\"?", "Staphylococcus aureus", "Group A beta-hemolytic streptococcus (GABHS)", "Escherichia coli", "Pseudomonas aeruginosa", 1],
+        ["A complication of streptococcal pharyngitis is:", "Diabetes", "Peritonsillar abscess", "Hepatitis", "Pancreatitis", 1],
+        ["Which diagnostic test provides rapid results for streptococcal pharyngitis?", "Blood culture", "Rapid streptococcal antigen test (RSAT)", "Throat culture (takes 24-48 hours)", "Chest X-ray", 1],
+        ["First-line antibiotic therapy for bacterial pharyngitis is:", "Tetracycline", "Penicillin", "Vancomycin", "Ciprofloxacin", 1],
+        ["Tonsils are located in the:", "Nasopharynx", "Oropharynx", "Hypopharynx", "Larynx", 1],
+        ["A common symptom of tonsillitis is:", "Chest pain", "Sore throat and fever", "Abdominal pain", "Back pain", 1],
+        ["Enlarged adenoids may cause:", "Mouth-breathing and earache", "Visual disturbances", "Hand tremors", "Leg weakness", 0],
+        ["Which condition is an indication for tonsillectomy?", "Single episode of tonsillitis", "Repeated episodes despite antibiotic therapy", "Mild throat pain", "Allergic rhinitis", 1],
+        ["Immediate postoperative positioning after tonsillectomy is:", "Supine", "Prone with head turned to side", "Sitting upright", "Trendelenburg", 1],
+        ["Laryngitis is inflammation of the:", "Pharynx", "Larynx", "Trachea", "Bronchi", 1],
+        ["A key symptom of laryngitis is:", "Productive cough", "Hoarseness or aphonia (loss of voice)", "Hemoptysis", "Chest tightness", 1],
+        ["Which is a risk factor for laryngitis?", "Low fluid intake", "Voice abuse and exposure to pollutants", "Excessive sleep", "Low-salt diet", 1],
+        ["Medical management of laryngitis includes:", "Voice rest and avoiding irritants", "Antibiotics for all cases", "Surgical intervention", "Chemotherapy", 0],
+        ["Reflux laryngitis may be treated with:", "Antihistamines", "Proton pump inhibitors (e.g., omeprazole)", "Bronchodilators", "Corticosteroids only", 1],
+        ["A priority nursing diagnosis for upper airway infection is:", "Risk for falls", "Impaired airway clearance", "Fluid volume excess", "Sleep deprivation", 1],
+        ["Which complication may arise from untreated upper airway infections?", "Sepsis or meningitis", "Bone fracture", "Liver failure", "Anemia", 0],
+        ["Nursing interventions to promote comfort include:", "Encouraging loud talking", "Warm saline gargles", "Cold drinks only", "Avoiding all fluids", 1],
+        ["To promote communication with laryngitis, the nurse should:", "Encourage shouting", "Provide alternative communication methods", "Avoid all communication", "Use complex medical terms", 1],
+        ["Patient education for URI prevention includes:", "Avoiding all vaccines", "Hand hygiene and influenza vaccination", "Smoking cessation only for elderly", "No need for lifestyle changes", 1],
+        ["Epistaxis is hemorrhage from the:", "Ears", "Nose", "Throat", "Lungs", 1],
+        ["A risk factor for epistaxis is:", "Low blood pressure", "Dry nasal mucous membranes", "Excessive fluid intake", "Hypoglycemia", 1],
+        ["Initial first aid for epistaxis is:", "Lying supine", "Pinching soft part of nose for 5-10 minutes", "Tilting head backward", "Inserting objects into nose", 1],
+        ["Correct positioning during epistaxis is:", "Lying flat", "Sitting upright with head tilted forward", "Trendelenburg position", "Prone position", 1],
+        ["After epistaxis, patients should avoid:", "All medications", "Vigorous exercise and hot/spicy foods", "Drinking water", "Rest", 1],
+        ["Laryngeal obstruction is particularly dangerous because:", "The larynx is highly flexible", "The larynx is a stiff box that won't stretch", "It has abundant blood supply", "It connects to the stomach", 1],
+        ["A cause of laryngeal obstruction is:", "Foreign body or angioedema", "Low blood sugar", "Hypertension", "Anemia", 0],
+        ["A clinical sign of laryngeal obstruction is:", "Bradycardia", "Use of accessory muscles for breathing", "Hypotension", "Hyperglycemia", 1],
+        ["Emergency treatment for obstruction from allergic edema includes:", "Antihistamines only", "Subcutaneous epinephrine", "Antibiotics", "Pain relievers", 1],
+        ["What is essential for monitoring in laryngeal obstruction?", "Blood glucose", "Continuous pulse oximetry", "Urine output", "Temperature only", 1],
+        ["The most common type of laryngeal cancer is:", "Adenocarcinoma", "Squamous cell carcinoma", "Small cell carcinoma", "Sarcoma", 1],
+        ["The strongest risk factor for laryngeal cancer is:", "Tobacco use", "High-fiber diet", "Exercise", "Vitamin supplements", 0],
+        ["An early symptom of laryngeal cancer is:", "Weight gain", "Hoarseness >2 weeks", "Productive cough", "Fever", 1],
+        ["Which diagnostic procedure uses a flexible scope to view the larynx?", "Bronchoscopy", "Indirect laryngoscopy", "Colonoscopy", "Laparoscopy", 1],
+        ["Treatment options for laryngeal cancer include:", "Surgery, radiation, chemotherapy", "Antibiotics only", "Lifestyle changes only", "No treatment available", 0],
+        ["Which surgery removes only a portion of the larynx?", "Total laryngectomy", "Partial laryngectomy", "Cordectomy", "Tracheostomy", 1],
+        ["Total laryngectomy results in:", "Temporary voice loss", "Permanent loss of voice", "Improved voice quality", "No voice changes", 1],
+        ["A priority nursing diagnosis post-laryngectomy is:", "Risk for constipation", "Impaired airway clearance", "Fluid volume excess", "Sleep pattern disturbance", 1],
+        ["Which complication may occur after laryngectomy?", "Aspiration", "Kidney stones", "Liver failure", "Osteoporosis", 0],
+        ["Nursing interventions include promoting:", "Oral intake immediately", "Alternative communication methods", "Speaking loudly", "Avoiding all communication", 1],
+        ["After tonsillectomy, bright red blood in vomit indicates:", "Normal healing", "Active bleeding", "Old blood", "Infection", 1],
+        ["A sign of postoperative bleeding after tonsillectomy is:", "Restlessness and rising pulse", "Bradycardia", "Hypotension only", "Hypothermia", 0],
+        ["Which is a potential complication after laryngectomy?", "Tracheostomal stenosis", "Improved swallowing", "Enhanced voice", "Decreased mucus", 0],
+        ["To prevent wound infection after surgery, nurses should:", "Avoid all wound care", "Monitor for signs of infection", "Use dry dressings only", "Not assess the wound", 1],
+        ["Patient education after upper airway surgery includes:", "Avoiding strenuous activity", "Immediate return to work", "Smoking to promote healing", "Ignoring follow-up appointments", 0],
+        ["Influenza vaccination is especially recommended for:", "Elderly and high-risk populations", "Only children", "Healthy young adults only", "No specific group", 0],
+        ["To prevent URIs, patients should be educated about:", "Hand hygiene", "Avoiding all vaccines", "Sharing personal items", "Smoking cessation only if symptomatic", 0],
+        ["A healthy lifestyle for respiratory health includes:", "Smoking and alcohol", "Avoiding tobacco and irritants", "Sedentary lifestyle", "Poor diet", 1],
+        ["Regular follow-up after cancer surgery is important to monitor for:", "Recurrence", "Weight gain only", "Improved vision", "Hair growth", 0],
+        ["The nurse's role in prevention includes:", "Patient education", "Only administering medications", "Avoiding patient contact", "Not discussing lifestyle", 0],
+        ["Pneumonia is defined as:", "Inflammation of the bronchi", "Inflammation of the lung parenchyma caused by microorganisms", "Accumulation of fluid in the pleural space", "Chronic obstructive lung disease", 1],
+        ["Which of the following is NOT a type of pneumonia classification?", "Community-acquired (CAP)", "Health care-associated (HCAP)", "Asthma-associated pneumonia", "Ventilator-associated (VAP)", 2],
+        ["Pneumonia that is distributed in patchy areas within the bronchi is called:", "Lobar pneumonia", "Bronchopneumonia", "Aspiration pneumonia", "Interstitial pneumonia", 1],
+        ["When a substantial portion of one or more lobes is involved, it is called:", "Lobar pneumonia", "Bronchopneumonia", "Atypical pneumonia", "Walking pneumonia", 0],
+        ["Pneumonia and influenza were the leading cause of death in the US in 2017 as:", "First", "Fifth", "Eighth", "Tenth", 2],
+        ["Pneumonia primarily affects:", "Only ventilation", "Only diffusion", "Both ventilation and diffusion", "Neither ventilation nor diffusion", 2],
+        ["An inflammatory reaction in the alveoli produces an exudate that interferes with:", "Blood pressure regulation", "Diffusion of oxygen and carbon dioxide", "Heart rate", "Kidney function", 1],
+        ["Which is a common risk factor for pneumonia?", "Hypertension", "Prolonged immobility", "Hyperglycemia", "Visual impairment", 1],
+        ["A depressed cough reflex increases pneumonia risk and can be caused by:", "High fluid intake", "Decreased level of consciousness", "Excessive exercise", "High-protein diet", 1],
+        ["Which underlying condition is a risk factor for pneumonia?", "Osteoarthritis", "COPD (Chronic Obstructive Pulmonary Disease)", "Migraine", "Psoriasis", 1],
+        ["Sudden onset of chills and high fever is typical of:", "Viral pneumonia", "Streptococcal (pneumococcal) pneumonia", "Aspiration pneumonia", "Fungal pneumonia", 1],
+        ["Orthopnea refers to:", "Chest pain with deep breathing", "Shortness of breath when reclining or supine", "Coughing up blood", "Excessive sweating", 1],
+        ["Rusty, blood-tinged sputum is characteristic of:", "Viral pneumonia", "Streptococcal, staphylococcal, or Klebsiella pneumonia", "Mycoplasma pneumonia", "All pneumonias", 1],
+        ["A relative bradycardia may suggest infection with:", "Mycoplasma or Legionella", "Streptococcus", "Staphylococcus", "Pseudomonas", 0],
+        ["Which is a LATE sign of hypoxemia in severe pneumonia?", "Tachypnea", "Central cyanosis (lips/nail beds)", "Fever", "Headache", 1],
+        ["The most important diagnostic tool for pneumonia is:", "ECG", "Chest x-ray", "Urinalysis", "Liver function tests", 1],
+        ["Pneumococcal vaccination is primarily for:", "Treating active pneumonia", "Preventing pneumonia", "Reducing fever", "Improving cough", 1],
+        ["Which laboratory test identifies the causative pathogen?", "Complete blood count", "Sputum culture and sensitivity", "Arterial blood gas", "Blood glucose", 1],
+        ["Preventive measures for pneumonia include:", "Hand hygiene and vaccination", "Increased sedation", "Supine positioning", "Avoiding all fluids", 0],
+        ["For inpatients, IV antibiotics should be switched to oral:", "After 1 week", "As soon as possible to establish normal GI function", "Never", "Only if fever persists", 1],
+        ["Severe complications of pneumonia include:", "Septic shock and respiratory failure", "Liver failure and renal calculi", "Bone fractures", "Skin rash", 0],
+        ["A pleural effusion is:", "Infection of the pericardium", "Accumulation of fluid in the pleural space", "Blood in the sputum", "Collapse of lung tissue", 1],
+        ["Empyema refers to:", "Clear pleural fluid", "Thick, purulent fluid in the pleural space", "Blood in the alveoli", "Mucus in bronchi", 1],
+        ["How long may sterilization of an empyema cavity require antibiotics?", "1-2 days", "1 week", "4-6 weeks", "6 months", 2],
+        ["Atelectasis may develop as a complication due to:", "Overhydration", "Obstruction from lung cancer or mucus plugs", "Excessive coughing", "High fever", 1],
+        ["A key nursing diagnosis for pneumonia is:", "Risk for falls", "Impaired airway clearance", "Fluid volume excess", "Sleep deprivation", 1],
+        ["Which collaborative problem is associated with pneumonia?", "Hypertension", "Sepsis and septic shock", "Diabetes mellitus", "Osteoporosis", 1],
+        ["In older adults, pneumonia may present with:", "Altered mental status and dehydration", "Increased energy", "Improved appetite", "No fever", 0],
+        ["The Confusion Assessment Method (CAM) is used to screen for:", "Pain", "Delirium", "Anxiety", "Depression", 1],
+        ["Delirium in pneumonia may be related to:", "Hypoxemia and fever", "Overeating", "Excessive sleep", "High blood pressure", 0],
+        ["To promote rest and breathing, the optimal position is:", "Prone", "Semi-Fowler's", "Trendelenburg", "Supine flat", 1],
+        ["Daily fluid intake for pneumonia patients should be at least:", "500 mL", "1 L", "2 L", "4 L", 2],
+        ["Hydration must be managed carefully in patients with:", "Anemia", "Heart failure", "Asthma", "Arthritis", 1],
+        ["Small, frequent meals are advised because patients often have:", "Decreased appetite and fatigue", "Excessive hunger", "Nausea only", "Food allergies", 0],
+        ["Patient education should include reporting:", "Mild fatigue", "Difficulty breathing and worsening cough", "Slight headache", "Increased appetite", 1],
+        ["Patients usually begin responding to antibiotic therapy within:", "2-4 hours", "24-48 hours", "5-7 days", "2 weeks", 1],
+        ["Persistent fever after starting antibiotics may indicate:", "Medication allergy or resistance", "Adequate hydration", "Recovery", "Overmedication", 0],
+        ["Failure of pneumonia to resolve may raise suspicion of:", "Lung cancer", "Diabetes", "Hypertension", "Anemia", 0],
+        ["After thoracentesis, monitor for:", "Pneumothorax", "Hyperglycemia", "Bradycardia", "Diarrhea", 0],
+        ["The nurse assists in administering IV fluids and medications for:", "Pain management", "Septic shock", "Sleep induction", "Appetite stimulation", 1],
+        ["Aspiration is defined as:", "Vomiting", "Inhalation of foreign material into the lungs", "Swallowing difficulties", "Gastric reflux", 1],
+        ["Aspiration pneumonia accounts for what percentage of CAP?", "1-2%", "5-15%", "25-35%", "50-60%", 1],
+        ["The most common form of aspiration pneumonia is:", "Chemical pneumonia", "Bacterial infection from upper airway bacteria", "Viral pneumonia", "Fungal pneumonia", 1],
+        ["Aspiration pneumonia can result from inhaling:", "Gastric contents", "Pure oxygen", "Sterile water", "Medications only", 0],
+        ["Death and complications after aspiration depend primarily on:", "Patient's age", "Volume and character of aspirated contents", "Time of day", "Blood type", 1],
+        ["If solid food particles are aspirated, the main problem is:", "Chemical burn", "Mechanical blockage and secondary infection", "Immediate heart failure", "Kidney damage", 1],
+        ["Acidic gastric juice, if aspirated, is destructive to:", "Alveoli and capillaries", "Heart valves", "Liver cells", "Bone marrow", 0],
+        ["Fecal contamination increases mortality because:", "Endotoxins are absorbed systemically", "It causes immediate shock", "It improves oxygenation", "It reduces fever", 0],
+        ["A major risk factor for aspiration is:", "High blood pressure", "Decreased level of consciousness", "Hyperactivity", "Good cough reflex", 1],
+        ["Esophageal conditions associated with aspiration include:", "Dysphagia and gastroesophageal reflux", "Peptic ulcer", "Gastritis", "Colitis", 0],
+        ["The primary goal when caring for patients at risk for aspiration is:", "Treatment", "Prevention", "Observation", "Medication", 1],
+        ["Head-of-bed elevation to prevent aspiration should be:", "0-15 degrees", "30-45 degrees", "60-75 degrees", "90 degrees", 1],
+        ["Before initiating tube feeding, confirm:", "Patient's appetite", "Tip location of the tube", "Blood glucose", "Urine output", 1],
+        ["For tube feedings, assess gastric residuals:", "Daily", "Weekly", "Every 4 hours", "Only if vomiting occurs", 2],
+        ["Acceptable gastric residual volume before next feeding is:", "<50 mL", "<150 mL", "<300 mL", "<500 mL", 1],
+        ["Endotracheal tube cuff pressure should be maintained:", "<10 cm H2O", "20-30 cm H2O", "40-50 cm H2O", ">60 cm H2O", 1],
+        ["Before deflating an ET tube cuff, the nurse should:", "Administer sedatives", "Perform hypopharyngeal suctioning", "Increase oxygen flow", "Feed the patient", 1],
+        ["For patients with swallowing dysfunction, a swallowing screen should be performed by:", "Pharmacist", "Speech therapist", "Physical therapist", "Dietitian", 1],
+        ["During feeding, patients should be instructed to:", "Use a straw", "Take small bites and tuck chin", "Lie flat", "Drink quickly", 1],
+        ["When vomiting, if an airway is in place, it should be:", "Left in place", "Pulled out to prevent stimulating gag reflex", "Pushed further in", "Suctioned through", 1],
+        ["Delayed stomach emptying can be caused by:", "Intestinal obstruction", "Excessive water intake", "Low stress levels", "Early ambulation", 0],
+        ["Increased gastric secretions during anxiety can lead to:", "Improved digestion", "Aspiration risk", "Reduced appetite", "Weight gain", 1],
+        ["Prolonged intubation can depress:", "Heart rate", "Laryngeal and glottic reflexes", "Kidney function", "Liver enzymes", 1],
+        ["Patients with prolonged tracheostomies should be encouraged to:", "Avoid talking", "Phonate and exercise laryngeal muscles", "Whisper only", "Not eat", 1],
+        ["Silent aspiration may occur when:", "Patient is coughing", "Non-functioning NG tube allows gastric accumulation", "Patient is awake and alert", "Feedings are given slowly", 1],
+        ["After pneumonia, fatigue and weakness may be prolonged especially in:", "Children", "Older adults", "Young athletes", "Pregnant women", 1],
+        ["The nurse encourages breathing exercises to promote:", "Sleep", "Secretions clearance and lung expansion", "Appetite", "Blood pressure", 1],
+        ["Smoking inhibits:", "Tracheobronchial ciliary action", "Heart function", "Kidney filtration", "Liver metabolism", 0],
+        ["Patients should be instructed to avoid after pneumonia:", "Sudden temperature changes and excessive alcohol", "All physical activity", "Drinking fluids", "Taking any medications", 0],
+        ["Influenza vaccination is important because influenza increases susceptibility to:", "Secondary bacterial pneumonia", "Viral hepatitis", "Kidney infection", "Skin rash", 0],
+        ["COPD is best defined as:", "A reversible airway disease caused by allergies", "A common, preventable, and treatable disease characterized by persistent respiratory symptoms and airflow limitation", "An infectious disease of the lower respiratory tract", "A genetic disorder only affecting young adults", 1],
+        ["Which two conditions most commonly overlap in COPD?", "Asthma and pneumonia", "Emphysema and chronic bronchitis", "Bronchiectasis and tuberculosis", "Atelectasis and pneumothorax", 1],
+        ["Chronic bronchitis is defined by:", "Wheezing for more than 6 months", "Cough and sputum production for at least 3 months over 2 consecutive years", "Barrel chest and clubbing", "Hemoptysis and weight loss", 1],
+        ["Pathophysiology of chronic bronchitis includes:", "Destruction of alveoli", "Thickening of bronchial walls, inflammation, excess mucus production, and bronchial narrowing", "Formation of bullae in lung parenchyma", "Loss of lung elasticity only", 1],
+        ["Emphysema is characterized by:", "Thickened bronchial walls", "Abnormal distention and destruction of airspaces beyond terminal bronchioles and alveolar walls", "Recurrent respiratory infections", "Isolated bronchospasm", 1],
+        ["Which type of emphysema primarily destroys the respiratory bronchiole, alveolar duct, and alveolus?", "Panlobular emphysema", "Centrilobular emphysema", "Bullous emphysema", "Paraseptal emphysema", 0],
+        ["Centrilobular emphysema is commonly associated with:", "Weight gain and bradycardia", "Isolated exercise intolerance", "Chronic hypoxemia, hypercapnia, polycythemia, and cor pulmonale", "Acute hemoptysis", 2],
+        ["The primary risk factor for COPD is:", "Tobacco smoke exposure (80–90% of cases)", "Genetic factors only", "Occupational dust exposure alone", "Advanced age without smoking history", 0],
+        ["Alpha1-Antitrypsin (AAT) deficiency is recommended to be tested in:", "All COPD patients over 60", "Only active smokers", "Patients <45 years, non-/light smokers, or with family history of COPD", "Patients with asthma only", 2],
+        ["The classic triad of COPD symptoms includes:", "Chronic cough, sputum production, progressive dyspnea", "Fever, chest pain, hemoptysis", "Cyanosis, clubbing, weight gain", "Wheezing, stridor, tachypnea", 0],
+        ["A “barrel chest” in COPD is due to:", "Increased mucus production", "Hyperinflation and loss of lung elasticity", "Pneumothorax", "Respiratory muscle hypertrophy only", 1],
+        ["Which diagnostic test is crucial for confirming COPD severity?", "Chest X-ray", "Spirometry (post-bronchodilator FEV1/FVC < 0.70)", "Sputum culture", "Complete blood count", 1],
+        ["Clubbing of fingers in COPD indicates:", "Acute infection", "Chronic hypoxemia", "Hypercapnia", "Pulmonary edema", 1],
+        ["Chest X-ray in COPD is primarily used to:", "Diagnose emphysema definitively", "Exclude other causes (e.g., heart failure, pneumonia, lung cancer)", "Measure lung volumes accurately", "Guide surgical planning", 1],
+        ["High-Resolution CT (HRCT) is most useful in:", "Routine screening for all COPD patients", "Confirming emphysematous changes, detecting bullae, or clarifying uncertain X-ray findings", "Diagnosing chronic bronchitis", "Assessing oxygen saturation", 1],
+        ["The main goals of pharmacologic therapy in COPD are:", "Cure the disease", "Relieve symptoms, improve exercise tolerance, prevent exacerbations", "Reverse lung damage", "Eliminate need for oxygen", 1],
+        ["Which medication class reduces inflammation and exacerbations in severe COPD?", "Bronchodilators only", "Inhaled Corticosteroids (ICS)", "Mucolytics", "Antibiotics", 1],
+        ["Long-term oxygen therapy is indicated when PaO2 is:", "70 mm Hg or less", "55 mm Hg or less", "90 mm Hg or less", "Only during exercise", 1],
+        ["High oxygen flow in COPD patients can lead to:", "Improved exercise capacity", "Reduced dyspnea", "Suppressed hypoxic drive, hypoventilation, and hypercapnia", "Decreased mucus production", 2],
+        ["Bullectomy is indicated for:", "All COPD patients", "Patients with bullous emphysema where bullae occupy thoracic space without contributing to ventilation", "Patients with chronic bronchitis only", "Those with severe pneumonia", 1],
+        ["Lung Volume Reduction Surgery aims to:", "Remove entire lung", "Remove diseased lung parenchyma to reduce hyperinflation and improve elastic recoil", "Transplant new lung tissue", "Drain pleural effusion", 1],
+        ["Pursed-lip breathing helps by:", "Increasing respiratory rate", "Slowing expiration, maintaining airway pressure, preventing small airway collapse, and promoting relaxation", "Decreasing tidal volume", "Raising PaCO2", 1],
+        ["Directed coughing technique includes:", "Rapid shallow breaths", "Slow maximal inspiration, breath-holding, followed by 2–3 coughs", "Coughing without inhalation", "Only using abdominal muscles", 1],
+        ["When using a peak flow meter, the patient should:", "Inhale as hard as possible", "Use it at the same time daily and compare readings to personal best", "Only use it during attacks", "Notify the doctor if reading is >90% of personal best", 1],
+        ["The “green zone” on a peak flow meter indicates:", "Emergency", "80–100% of personal best", "60–80% of personal best", "Below 60% of personal best", 1],
+        ["Which is NOT a common complication of COPD?", "Cor pulmonale", "Pneumothorax", "Respiratory failure", "Left-sided heart failure (Note: Cor pulmonale is right-sided)", 3],
+        ["Status asthmaticus refers to:", "Mild intermittent asthma", "Severe, persistent bronchospasm unresponsive to conventional therapy", "Exercise-induced asthma", "Allergic asthma only", 1],
+        ["Bronchiectasis is characterized by:", "Reversible bronchospasm", "Chronic, irreversible dilation of bronchi/bronchioles due to muscle and elastic tissue destruction", "Isolated alveolar damage", "Acute inflammation only", 1],
+        ["A key clinical manifestation of bronchiectasis is:", "No sputum production", "Chronic cough with copious purulent, foul-smelling sputum", "Isolated wheezing without cough", "Chest pain without sputum", 1],
+        ["Asthma is best described as:", "An infectious disease", "A chronic inflammatory disease of airways with hyperresponsiveness, edema, and mucus production", "A restrictive lung disease", "A vascular disorder", 1],
+        ["Which class of asthma medications is used for quick relief?", "Short-acting β 2-agonists (SABAs) like albuterol", "Inhaled corticosteroids", "Long-acting bronchodilators", "Leukotriene modifiers", 0],
+        ["A patient with COPD is learning breathing techniques. Which statement indicates the need for further teaching on pursed-lip breathing?", "“I will breathe out like I’m blowing out a candle.”", "“ I will puff my cheeks out when breathing out. ”", "“ I will not hold my breath while breathing. ”", "“ I will use this when I feel short of breath. ”", 1],
+        ["The most common cause of tooth loss among adults is:", "Dental caries", "Periodontal disease (gingivitis and periodontitis)", "Oral cancer", "Xerostomia", 1],
+        ["Stomatitis is most commonly a side effect of:", "Poor oral hygiene", "Chemotherapy or radiation therapy", "High-sugar diet", "Aging", 1],
+        ["Xerostomia (dry mouth) can be caused by all of the following EXCEPT:", "Radiation therapy", "Increased nasal breathing", "Psychopharmacologic agents", "HIV infection", 1],
+        ["A recommended management strategy for xerostomia is:", "Avoiding all oral liquids", "Using oral moisturizing jelly or saliva substitutes", "Increasing spicy food intake", "Reducing oral care frequency", 1],
+        ["Which of the following is a key nursing intervention for oral cavity disorders?", "Encouraging hard and crunchy foods", "Educating on preventive mouth care and using baking soda rinses", "Limiting fluid intake to reduce salivation", "Avoiding all topical medications", 1],
+        ["When ensuring adequate food and fluid intake in a patient with oral disorders, the nurse should:", "Restrict all oral intake to prevent aspiration", "Record a daily calorie count and monitor nutritional intake", "Encourage large meals three times a day", "Avoid enteral feedings", 1],
+        ["To support a positive self-image in a patient with oral disfigurement, the nurse should:", "Avoid discussing appearance changes", "Encourage verbalization of fears and negative feelings", "Limit social interactions", "Focus only on physical care", 1],
+        ["Which strategy helps minimize pain in patients with oral lesions?", "Recommending soft or liquid diets and avoiding spicy foods", "Encouraging vigorous brushing", "Applying heat directly to lesions", "Withholding all analgesics", 0],
+        ["To prevent infection in a patient with oral disorders, the nurse should:", "Allow unlimited visitors", "Monitor temperature and protect sensitive tissues from trauma", "Use non-sterile dressing techniques", "Avoid all antibiotic use", 1],
+        ["The most common symptom of esophageal disease is:", "Dysphagia", "Hemoptysis", "Tachycardia", "Abdominal distention", 0],
+        ["Which of the following is NOT a disorder of the esophagus?", "Achalasia", "Hiatal hernia", "Gingivitis", "Barrett esophagus", 2],
+        ["Achalasia is characterized by:", "Increased peristalsis and sphincter relaxation", "Absent peristalsis and failure of the esophageal sphincter to relax", "Inflammation of the esophageal lining", "Herniation of the stomach into the thorax", 1],
+        ["The hallmark symptom of achalasia is:", "Chest pain of cardiac origin", "Dysphagia, especially with solid foods", "Hematemesis", "Diarrhea", 1],
+        ["Which diagnostic test is most specific for assessing esophageal pressure and motility in achalasia?", "Barium swallow", "High-resolution manometry", "Chest X-ray", "Complete blood count", 1],
+        ["A surgical treatment for achalasia is:", "Nissen fundoplication", "Heller myotomy (esophagomyotomy)", "Gastrectomy", "Cholecystectomy", 1],
+        ["Which symptom is common in esophageal spasm?", "Bradycardia", "Chest pain similar to coronary artery spasm", "Hematuria", "Joint pain", 1],
+        ["Management of esophageal spasm may include:", "High-fat diet", "Calcium channel blockers to reduce contractions", "Encouraging large meals", "Avoiding all fluids", 1],
+        ["The most common type of hiatal hernia is:", "Paraesophageal", "Sliding (type I)", "Incisional", "Congenital", 1],
+        ["Which complication is more common with a paraesophageal hernia?", "Weight gain", "Strangulation, obstruction, or hemorrhage", "Improved digestion", "Reduced reflux", 1],
+        ["Postoperative nursing care after hiatal hernia repair includes:", "Encouraging immediate solid food intake", "Advancing diet slowly from liquids to solids and monitoring for dysphagia", "Keeping the patient flat in bed", "Limiting pain medication", 1],
+        ["GERD is primarily caused by:", "Increased esophageal motility", "Incompetent lower esophageal sphincter and backflow of gastric contents", "Hyperactive pyloric sphincter", "Reduced gastric acid production", 1],
+        ["A key lifestyle modification for GERD management is:", "Eating large meals before bedtime", "Elevating the head of the bed and avoiding late-night eating", "Increasing alcohol consumption", "Avoiding weight loss", 1],
+        ["Which diagnostic method is commonly used for GERD?", "MRI", "pH monitoring and endoscopy", "Urinalysis", "Pulmonary function test", 1],
+        ["Surgical intervention for severe GERD may involve:", "Heller myotomy", "Nissen fundoplication", "Gastric bypass", "Esophagectomy", 1],
+        ["Based on the nursing process, a common nursing diagnosis for esophageal disorders is:", "Excess fluid volume", "Impaired nutritional intake related to dysphagia", "Hyperthermia", "Impaired urinary elimination", 1],
+        ["A peptic ulcer is best defined as:", "A benign tumor of the stomach lining", "An excavation (hollowed-out area) in the mucosa of the stomach, pylorus, duodenum, or esophagus", "An inflammation of the entire gastrointestinal tract", "A bacterial infection limited to the esophagus", 1],
+        ["The most common location for a peptic ulcer is:", "Stomach", "Duodenum", "Esophagus", "Jejunum", 1],
+        ["Esophageal ulcers are most commonly caused by:", "H. pylori infection", "Gastroesophageal reflux disease (GERD)", "Excessive alcohol intake", "Zollinger-Ellison syndrome", 1],
+        ["Which of the following is a major risk factor for peptic ulcer disease?", "High-fiber diet", "Use of NSAIDs (e.g., ibuprofen, aspirin)", "Vegetarian diet", "Regular exercise", 1],
+        ["Which blood type is associated with a higher susceptibility to peptic ulcers?", "Type A", "Type O", "Type B", "Type AB", 1],
+        ["Zollinger-Ellison syndrome is characterized by:", "Hypochlorhydria", "Benign or malignant tumors that secrete excessive gastrin", "Autoimmune destruction of gastric mucosa", "Chronic constipation", 1],
+        ["Peptic ulcers are associated with all of the following EXCEPT:", "COPD", "Chronic kidney disease", "Liver cirrhosis", "Hypertension", 3],
+        ["Which symptom is most characteristic of a “silent” peptic ulcer?", "Severe abdominal pain", "Absence of pain, especially in older adults and NSAID users", "Hematemesis", "Diarrhea", 1],
+        ["A key sign of perforation in peptic ulcer disease is:", "Hypothermia", "Severe, sharp upper abdominal pain that may radiate to the shoulder", "Hypertension", "Bradycardia", 1],
+        ["Which symptom is more typical of a duodenal ulcer than a gastric ulcer?", "Pain worsens after eating", "Pain relieved by eating or antacids", "Weight gain", "Early satiety", 1],
+        ["The gold standard for diagnosing H. pylori infection is:", "Serologic testing", "Endoscopic biopsy with histologic examination", "Stool antigen test", "Urea breath test", 1],
+        ["A patient with hyperchlorhydria would have:", "No gastric acid", "Low gastric acid", "High gastric acid levels", "Normal gastric acid levels", 2],
+        ["Which test is essential for diagnosing Zollinger-Ellison syndrome?", "Colonoscopy", "Gastric secretory studies", "Abdominal ultrasound", "Complete blood count", 1],
+        ["First-line pharmacologic therapy for H. pylori-positive peptic ulcers includes:", "Single antibiotic therapy", "Combination of two antibiotics + a proton pump inhibitor", "Antacids only", "H2 blockers alone", 1],
+        ["Misoprostol is contraindicated in pregnant women because it can:", "Cause fetal hypertension", "Soften the cervix and induce miscarriage/premature labor", "Lead to fetal hypoglycemia", "Increase risk of congenital defects", 1],
+        ["Which medication is used prophylactically in mechanically ventilated patients to prevent stress ulcers?", "Insulin", "H2 blockers or proton pump inhibitors", "Anticoagulants", "Beta-blockers", 1],
+        ["Dietary recommendations for peptic ulcer patients include:", "Eating large, infrequent meals", "Avoiding extremes of temperature, alcohol, and coffee", "Increasing spicy food intake", "Fasting during pain episodes", 1],
+        ["Smoking worsens peptic ulcer disease by:", "Increasing gastric mucus production", "Decreasing pancreatic bicarbonate secretion, leading to increased duodenal acidity", "Reducing gastric acid secretion", "Promoting H. pylori eradication", 1],
+        ["Indications for surgical intervention in peptic ulcer disease include all EXCEPT:", "Perforation", "Obstruction", "Life-threatening hemorrhage", "First-time H. pylori infection", 3],
+        ["A vagotomy aims to:", "Increase gastric acid secretion", "Reduce acid secretion by transecting vagal nerves", "Remove the entire stomach", "Repair a hiatal hernia", 1],
+        ["Which surgical procedure involves removing the antrum and connecting the stomach to the jejunum?", "Billroth I", "Billroth II (gastrojejunostomy)", "Pyloroplasty", "Nissen fundoplication", 1],
+        ["The main benefit of laparoscopic surgery over open abdominal surgery is:", "Longer hospital stay", "Decreased postoperative pain, bleeding, and recovery time", "Higher risk of infection", "Requirement for larger incisions", 1],
+        ["Hematemesis with “coffee grounds” appearance is due to:", "Fresh bleeding", "Oxidation of hemoglobin to methemoglobin", "Lower GI bleeding", "Biliary obstruction", 1],
+        ["Which complication requires immediate surgical intervention?", "Mild dyspepsia", "Perforation", "Occult blood in stool", "Gastric outlet obstruction", 1],
+        ["Gastric outlet obstruction is confirmed when NG tube aspirate exceeds:", "100 mL", "400 mL", "800 mL", "1000 mL", 1],
+        ["A key nursing diagnosis for a patient with peptic ulcer disease is:", "Impaired gas exchange", "Acute pain related to gastric acid secretion on damaged tissue", "Fluid volume excess", "Hyperthermia", 1],
+        ["To reduce anxiety in a peptic ulcer patient, the nurse should:", "Limit explanations of procedures", "Administer medications on schedule and teach relaxation techniques", "Avoid family involvement", "Encourage withholding pain medication", 1],
+        ["Patient education for home care should emphasize:", "Stopping medications once pain subsides", "Continuing medications as prescribed and avoiding NSAIDs/alcohol", "Increasing aspirin use for pain", "Eating large meals before bedtime", 1],
+        ["Maintenance therapy with H2 blockers is recommended for patients with:", "First-time, uncomplicated ulcers", "Recurrent ulcers (2–3 times per year) or prior complications", "No history of smoking", "Normal gastric acid levels", 1],
+        ["Which action reduces the likelihood of ulcer recurrence?", "Increasing coffee intake", "Avoiding smoking, alcohol, and ulcerogenic medications", "Using NSAIDs regularly", "Skipping meals", 1],
+        ["Hepatitis is best defined as:", "A bacterial infection of the liver", "An inflammation of the liver caused by infectious viruses or noninfectious agents", "A genetic disorder affecting bile production", "A type of gallbladder stone", 1],
+        ["Which types of hepatitis are transmitted primarily via the fecal–oral route?", "Hepatitis B and C", "Hepatitis A and E", "Hepatitis D and B", "Hepatitis C and D", 1],
+        ["Which hepatitis type is known as \"infectious hepatitis\"?", "Hepatitis A", "Hepatitis B", "Hepatitis C", "Hepatitis E", 0],
+        ["Hepatitis A is transmitted through:", "Blood transfusions", "Fecal–oral route, contaminated food/water, poor hygiene", "Sexual contact only", "Airborne droplets", 1],
+        ["A characteristic symptom of HAV is:", "Chronic liver failure", "An aversion to cigarette smoke and strong odors", "Persistent jaundice", "High-grade fever with rash", 1],
+        ["Prevention of HAV includes:", "Avoiding all physical activity", "Vaccination, hand hygiene, safe water, and sewage control", "Blood screening", "Use of antiviral medications daily", 1],
+        ["Hepatitis B can lead to:", "Only acute illness with full recovery", "Chronic hepatitis, cirrhosis, and hepatocellular carcinoma", "Gallstones", "Pancreatitis", 1],
+        ["Which body fluids can transmit HBV?", "Sweat and tears only", "Blood, saliva, semen, and vaginal secretions", "Urine only", "Respiratory droplets", 1],
+        ["The hepatitis B vaccine is typically administered in:", "One dose", "Three doses over 6 months", "Five doses annually", "Only to healthcare workers", 1],
+        ["Medical management of HBV may include:", "Antibiotics only", "Alpha-interferon and antiviral agents like entecavir", "Surgical removal of the liver", "High-fat diet", 1],
+        ["Hepatitis C is most commonly transmitted via:", "Fecal–oral route", "Percutaneous and permucosal routes (e.g., blood exposure)", "Contaminated water", "Airborne transmission", 1],
+        ["Which test is used to detect recent HCV exposure?", "Liver biopsy", "HCV RNA testing", "Abdominal X-ray", "Stool antigen test", 1],
+        ["A key pharmacologic treatment for HCV is:", "Vitamin supplements", "Combination therapy with peginterferon and ribavirin", "Antibiotics", "Antifungals", 1],
+        ["Hepatitis D infection can only occur in patients who:", "Have never had hepatitis", "Are already infected with Hepatitis B", "Have gallbladder disease", "Are immunized against HAV", 1],
+        ["Hepatitis E is characterized by:", "Chronic infection", "Abrupt onset with jaundice, transmitted via contaminated water", "Bloodborne transmission only", "Being preventable by HBV vaccine", 1],
+        ["Dietary management for hepatitis includes:", "High-fat, low-protein meals", "High-calorie, high-protein, small frequent meals, restricted fat", "Fasting during acute phase", "Increased alcohol intake", 1],
+        ["Which measure helps prevent Hepatitis B and C?", "Drinking boiled water only", "Using needleless IV systems, standard precautions, avoiding high-risk behaviors", "Avoiding all physical contact", "Taking aspirin daily", 1],
+        ["Cholecystitis is defined as:", "Inflammation of the liver", "Inflammation of the gallbladder", "Obstruction of the pancreas", "Infection of the bile ducts", 1],
+        ["The two major types of gallstones are:", "Calcium and bilirubin stones", "Cholesterol stones and pigment stones", "Infectious and metabolic stones", "Solid and liquid stones", 1],
+        ["Cholesterol gallstones form due to:", "Increased bile acid synthesis", "Decreased bile acid synthesis and increased cholesterol saturation in bile", "Bacterial infection of the gallbladder", "Excessive water intake", 1],
+        ["Biliary colic is characterized by:", "Dull, constant lower abdominal pain", "Excruciating upper right abdominal pain radiating to the back or shoulder", "Left-sided chest pain", "Generalized joint pain", 1],
+        ["Jaundice in cholecystitis occurs due to:", "Excessive bile production", "Obstruction of the common bile duct", "Decreased bilirubin excretion", "Vitamin deficiency", 1],
+        ["A patient with prolonged biliary obstruction may develop bleeding due to deficiency of:", "Vitamin C", "Vitamin K", "Vitamin B12", "Vitamin D", 1],
+        ["Changes in urine and stool color due to biliary obstruction include:", "Pale urine and black stools", "Dark urine and clay-colored stools", "Red urine and green stools", "Clear urine and yellow stools", 1],
+        ["The most common diagnostic test for detecting gallstones is:", "CT scan", "Abdominal ultrasonography", "MRI", "Blood culture", 1],
+        ["Which test is used to assess gallbladder function and detect stones?", "Barium swallow", "Oral cholecystography", "Colonoscopy", "Pulmonary function test", 1],
+        ["Initial medical management for acute cholecystitis includes:", "Immediate surgery", "Rest, IV fluids, nasogastric suction, analgesia, antibiotics", "High-fat diet to stimulate bile flow", "Antiviral therapy", 1],
+        ["Pharmacologic dissolution of gallstones may involve:", "Antibiotics", "Ursodeoxycholic acid (UDCA)", "Insulin", "Chemotherapy", 1],
+        ["The definitive surgical treatment for symptomatic gallstones is:", "Lithotripsy", "Cholecystectomy (often laparoscopic)", "Appendectomy", "Gastric bypass", 1],
+        ["A key nursing diagnosis for a postoperative cholecystectomy patient is:", "Impaired urinary elimination", "Acute pain related to surgical incision", "Fluid volume excess", "Ineffective airway clearance", 1],
+        ["Postoperative nursing interventions include monitoring for:", "Hyperglycemia", "Bleeding, infection, and GI symptoms related to biliary leak", "Hypertension", "Renal failure", 1],
+        ["Patient education after gallbladder surgery should include:", "Increasing fat intake", "Incision care, dietary modifications, and signs of infection", "Avoiding all physical activity for 6 months", "Stopping all medications immediately", 1],
+        ["The appendix is attached to which part of the intestine?", "Ileum", "Cecum", "Jejunum", "Sigmoid colon", 1],
+        ["Appendicitis is most common in which age group?", "0–5 years", "10–30 years", "40–60 years", "Over 70 years", 1],
+        ["Appendicitis is slightly more common in:", "Females", "Males", "Equally in both sexes", "Only in children", 1],
+        ["The most common cause of appendiceal obstruction is:", "Foreign body", "Fecalith (hardened stool)", "Tumor", "Parasitic infection", 1],
+        ["Untreated appendicitis can lead to:", "Improved drainage", "Gangrene or perforation", "Spontaneous healing", "Chronic constipation", 1],
+        ["Which pathophysiological event occurs first in appendicitis?", "Bacterial overgrowth", "Obstruction of the appendix lumen", "Perforation", "Systemic infection", 1],
+        ["The classic early symptom of appendicitis is:", "Right lower quadrant pain", "Vague periumbilical pain", "Left upper quadrant pain", "Back pain", 1],
+        ["McBurney’s point is located in the:", "Left lower quadrant", "Right lower quadrant", "Epigastric region", "Suprapubic area", 1],
+        ["Rovsing’s sign is positive when:", "Pain occurs in the left lower quadrant when the right is pressed", "Pain occurs in the right lower quadrant when the left is pressed", "Pain occurs in the umbilicus when coughing", "Pain occurs in the shoulder when lying down", 1],
+        ["Which medication should be avoided in suspected appendicitis?", "Antibiotics", "Laxatives or cathartics", "Analgesics", "Antiemetics", 1],
+        ["The most common laboratory finding in appendicitis is:", "Low hemoglobin", "Elevated WBC count with neutrophilia", "Elevated blood glucose", "Low platelet count", 1],
+        ["C-reactive protein (CRP) typically rises within:", "1–2 hours", "First 12 hours", "24–48 hours", "72 hours", 1],
+        ["Which imaging study is preferred for diagnosing appendicitis?", "X-ray", "CT scan or abdominal ultrasound", "MRI", "PET scan", 1],
+        ["A pregnancy test is important in female patients to rule out:", "Ovarian cyst", "Ectopic pregnancy", "Uterine fibroids", "Pelvic inflammatory disease", 1],
+        ["The definitive treatment for appendicitis is:", "Antibiotics alone", "Appendectomy", "Pain management", "Bowel rest", 1],
+        ["Which surgical approach is preferred for appendectomy?", "Open laparotomy", "Laparoscopic appendectomy", "Robotic surgery", "Endoscopic resection", 1],
+        ["Antibiotic therapy for perforated appendicitis typically lasts:", "<24 hours", "Up to 5 days", "10–14 days", "1 month", 1],
+        ["If an abscess forms, initial management includes:", "Immediate surgery", "Drainage and antibiotics, followed by delayed appendectomy", "Observation only", "High-fiber diet", 1],
+        ["Preoperatively, nurses should avoid administering:", "IV fluids", "Enemas or laxatives", "Antibiotics", "Analgesics", 1],
+        ["Postoperatively, patients should be placed in which position?", "Supine", "High Fowler’s position", "Trendelenburg", "Left lateral", 1],
+        ["To prevent atelectasis, patients should be encouraged to:", "Limit movement", "Use incentive spirometer every 2 hours while awake", "Avoid deep breathing", "Restrict fluids", 1],
+        ["Same-day discharge is possible after laparoscopic appendectomy if the patient has:", "Severe pain", "Normal temperature and minimal pain", "No bowel sounds", "High fever", 1],
+        ["Colorectal cancer is the ______ leading cause of cancer death.", "First", "Third", "Fifth", "Tenth", 1],
+        ["Which is NOT a risk factor for colorectal cancer?", "High-fat diet", "High-fiber diet", "Family history", "Inflammatory bowel disease", 1],
+        ["The most common symptom of colorectal cancer is:", "Weight gain", "Change in bowel habits", "Hypertension", "Skin rash", 1],
+        ["Screening for colorectal cancer in average-risk adults should begin at age:", "40", "45–50", "60", "70", 1],
+        ["The gold standard for colorectal cancer screening is:", "Fecal occult blood test", "Colonoscopy", "CT colonography", "Sigmoidoscopy", 1],
+        ["Which tumor marker is used in colorectal cancer?", "PSA", "Carcinoembryonic antigen (CEA)", "CA-125", "AFP", 1],
+        ["The primary treatment for localized colorectal cancer is:", "Chemotherapy", "Surgery", "Radiation therapy", "Immunotherapy", 1],
+        ["Preoperative bowel preparation may include:", "High-residue diet", "Low-residue diet, enemas, and antibiotics", "Increased fluid restriction", "No dietary changes", 1],
+        ["A key nursing diagnosis for a patient undergoing colorectal surgery is:", "Impaired gas exchange", "Risk for infection related to bowel surgery", "Fluid volume excess", "Impaired mobility", 1],
+        ["After appendectomy, patients should avoid heavy lifting for:", "1 week", "2–4 weeks", "6 weeks", "3 months", 1],
+        ["Patients should report which sign of infection postoperatively?", "Mild itching", "Fever, swelling, or discharge at incision site", "Slight redness", "Temporary numbness", 1],
+        ["Postoperative care for colorectal cancer patients includes monitoring for:", "Hyperglycemia", "Hypovolemia, infection, and skin integrity", "Hypertension", "Urinary retention only", 1]
+    ];
+
+    // --- LOGIC ---
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let wrongAnswers = [];
+    let soundEnabled = true;
+
+    // Audio Context (Synthesized sounds)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playSound(type) {
+        if (!soundEnabled) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+        
+        if (type === 'correct') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, now);
+            osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        } else {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.linearRampToValueAtTime(100, now + 0.3);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        }
+    }
+
+    // Init
+    document.getElementById('total-q-display').textContent = db.length;
+    document.getElementById('q-count').max = db.length;
+
+    function startQuiz() {
+        const countInput = parseInt(document.getElementById('q-count').value);
+        const count = Math.min(Math.max(1, countInput), db.length);
+        soundEnabled = document.getElementById('sound-toggle').checked;
+
+        // Shuffle and slice
+        const shuffled = [...db].sort(() => 0.5 - Math.random());
+        currentQuestions = shuffled.slice(0, count);
+        
+        currentIndex = 0;
+        score = 0;
+        wrongAnswers = [];
+
+        document.getElementById('setup-panel').classList.remove('active');
+        document.getElementById('quiz-panel').classList.add('active');
+        
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const qData = currentQuestions[currentIndex];
+        const qText = qData[0];
+        const options = qData.slice(1, 5);
+        
+        document.getElementById('q-progress').textContent = `Question ${currentIndex + 1} / ${currentQuestions.length}`;
+        document.getElementById('question-text').textContent = qText;
+        document.getElementById('score-display').textContent = `Score: ${score}`;
+
+        // Reset UI
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('end-btn').style.display = 'inline-block';
+        document.getElementById('progress-fill').style.width = `${(currentIndex / currentQuestions.length) * 100}%`;
+
+        const grid = document.getElementById('options-grid');
+        grid.innerHTML = '';
+
+        options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt;
+            btn.onclick = () => checkAnswer(idx, btn);
+            grid.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selectedIdx, btnElement) {
+        const qData = currentQuestions[currentIndex];
+        const correctIdx = qData[5];
+        const allBtns = document.querySelectorAll('.option-btn');
+
+        // Disable all buttons
+        allBtns.forEach(b => b.disabled = true);
+
+        if (selectedIdx === correctIdx) {
+            btnElement.classList.add('correct', 'anim-pop');
+            playSound('correct');
+            score++;
+        } else {
+            btnElement.classList.add('wrong', 'anim-pop');
+            allBtns[correctIdx].classList.add('correct'); // Show correct one
+            playSound('wrong');
+            
+            // Save for review
+            wrongAnswers.push({
+                q: qData[0],
+                user: qData[selectedIdx + 1],
+                correct: qData[correctIdx + 1]
+            });
+        }
+
+        document.getElementById('score-display').textContent = `Score: ${score}`;
+        document.getElementById('next-btn').style.display = 'inline-block';
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        if (currentIndex < currentQuestions.length) {
+            loadQuestion();
+        } else {
+            finishQuiz();
+        }
+    }
+
+    function finishQuiz() {
+        document.getElementById('quiz-panel').classList.remove('active');
+        document.getElementById('result-panel').classList.add('active');
+
+        // Calculate score based on questions ATTEMPTED (if ended early) or TOTAL (if finished)
+        // For fairness, if ended early, we base % on attempted.
+        const total = currentIndex === 0 ? 1 : currentIndex; // Avoid div by zero
+        // Actually, logic is: if finished normally, total is length. If early, total is current index + 1 (if answered)
+        // Simplified: use currentIndex if buttons clicked, but if next-btn visible, currentIndex + 1 answered.
+        // Let's stick to questions seen.
+        
+        let processed = currentIndex;
+        // If the user answered the last question displayed but didn't click next, count it
+        if (document.getElementById('next-btn').style.display !== 'none') {
+             processed = currentIndex + 1;
+        }
+
+        if (processed === 0) processed = 1;
+
+        const percent = Math.round((score / processed) * 100);
+        document.getElementById('final-score').textContent = `${percent}%`;
+        document.getElementById('final-stats').textContent = `${score} out of ${processed} correct`;
+
+        // Render Review
+        const list = document.getElementById('review-list');
+        list.innerHTML = '';
+        if (wrongAnswers.length === 0) {
+            list.innerHTML = '<p style="text-align:center; color: var(--success);">Perfect! No wrong answers.</p>';
+        } else {
+            wrongAnswers.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'review-item';
+                div.innerHTML = `
+                    <div class="review-q">${item.q}</div>
+                    <div class="review-a">You chose: ${item.user}</div>
+                    <div class="review-c">Correct: ${item.correct}</div>
+                `;
+                list.appendChild(div);
+            });
+        }
+    }
+
+</script>
+</body>
+</html>
